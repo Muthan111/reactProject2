@@ -265,6 +265,12 @@
   box-shadow: var(--shadow);
 }
 
+.quiz-option--selected {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: var(--shadow);
+}
+
 .quiz-option__index {
   display: inline-flex;
   width: 2rem;
@@ -302,6 +308,11 @@
 .quiz-action--primary {
   background: var(--accent);
   color: white;
+}
+
+.quiz-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 @media (prefers-color-scheme: dark) {

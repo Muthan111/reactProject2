@@ -4,8 +4,11 @@ type Props = {
   currentScore: number;
   questionNumber: number;
   totalQuestions: number;
+  selectedOption: string | null;
+  setSelectedOption: (option: string) => void;
   onSubmit: () => void;
   onBack: () => void;
+  difficulty: string;
 };
 
 const Screen1 = ({
@@ -14,12 +17,16 @@ const Screen1 = ({
   currentScore,
   questionNumber,
   totalQuestions,
+  selectedOption,
+  setSelectedOption,
   onSubmit,
   onBack,
+  difficulty,
 }: Props) => {
   return (
     <section className="quiz-screen">
       <div className="quiz-screen__top">
+        <span className="quiz-pill">{difficulty}</span>
         <span className="quiz-pill">Question {questionNumber}</span>
         <span className="quiz-pill">Score: {currentScore}</span>
       </div>
@@ -32,7 +39,12 @@ const Screen1 = ({
 
         <div className="quiz-options" aria-label="Answer options">
           {options.map((option, index) => (
-            <button key={option} type="button" className="quiz-option">
+            <button
+              key={option}
+              type="button"
+              className={`quiz-option${selectedOption === option ? " quiz-option--selected" : ""}`}
+              onClick={() => setSelectedOption(option)}
+            >
               <span className="quiz-option__index">{index + 1}</span>
               <span>{option}</span>
             </button>
@@ -43,8 +55,13 @@ const Screen1 = ({
           <button type="button" className="quiz-action quiz-action--secondary" onClick={onBack}>
             Back
           </button>
-          <button type="button" className="quiz-action quiz-action--primary" onClick={onSubmit}>
-            Submit
+          <button
+            type="button"
+            className="quiz-action quiz-action--primary"
+            onClick={onSubmit}
+            disabled={!selectedOption}
+          >
+            {questionNumber === totalQuestions ? "Finish" : "Next"}
           </button>
         </div>
       </div>

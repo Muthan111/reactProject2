@@ -1,19 +1,24 @@
 interface Props {
-  nextStage: () => void;
+  startQuiz: (difficulty: Difficulty) => void;
 }
-const Start = ({ nextStage }: Props) => {
-  const difficultyLevels = ["Easy", "Medium", "Hard", "Expert"];
+export type Difficulty = "Easy" | "Medium" | "Hard" | "Expert";
+
+const Start = ({ startQuiz }: Props) => {
+  const difficultyLevels: Difficulty[] = ["Easy", "Medium", "Hard", "Expert"];
 
   return (
-    <div>
-      <h1>Math Quiz</h1>
-      <p>Choose Quiz Difficulty</p>
+    <section className="quiz-screen">
+      <div className="quiz-card">
+        <p className="quiz-card__eyebrow">Math Quiz</p>
+        <h1>Choose Quiz Difficulty</h1>
+        <p>Each difficulty now includes 5 questions.</p>
       <div>
         {difficultyLevels.map((level) => (
           <button
             key={level}
             type="button"
-            onClick={nextStage}
+            className="quiz-action quiz-action--primary"
+            onClick={() => startQuiz(level)}
             style={{
               margin: "0.5rem",
               padding: "0.75rem 1.5rem",
@@ -24,7 +29,8 @@ const Start = ({ nextStage }: Props) => {
           </button>
         ))}
       </div>
-    </div>
+      </div>
+    </section>
   );
 };
 
