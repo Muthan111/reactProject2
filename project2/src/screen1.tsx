@@ -1,26 +1,54 @@
 type Props = {
+  question: string;
+  options: string[];
+  currentScore: number;
+  questionNumber: number;
+  totalQuestions: number;
   onSubmit: () => void;
   onBack: () => void;
 };
 
-const Screen1 = ({ onSubmit, onBack }: Props) => {
-  const handleSubmit = () => {
-    onSubmit();
-  };
-
+const Screen1 = ({
+  question,
+  options,
+  currentScore,
+  questionNumber,
+  totalQuestions,
+  onSubmit,
+  onBack,
+}: Props) => {
   return (
-    <div>
-      <h2>Screen 1</h2>
-      <p>When you're ready, submit to continue.</p>
-      <div style={{ display: "flex", gap: "0.75rem" }}>
-        <button type="button" onClick={onBack}>
-          Back
-        </button>
-        <button type="button" onClick={handleSubmit}>
-          Submit
-        </button>
+    <section className="quiz-screen">
+      <div className="quiz-screen__top">
+        <span className="quiz-pill">Question {questionNumber}</span>
+        <span className="quiz-pill">Score: {currentScore}</span>
       </div>
-    </div>
+
+      <div className="quiz-card">
+        <p className="quiz-card__eyebrow">
+          Question {questionNumber} of {totalQuestions}
+        </p>
+        <h2>{question}</h2>
+
+        <div className="quiz-options" aria-label="Answer options">
+          {options.map((option, index) => (
+            <button key={option} type="button" className="quiz-option">
+              <span className="quiz-option__index">{index + 1}</span>
+              <span>{option}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="quiz-actions">
+          <button type="button" className="quiz-action quiz-action--secondary" onClick={onBack}>
+            Back
+          </button>
+          <button type="button" className="quiz-action quiz-action--primary" onClick={onSubmit}>
+            Submit
+          </button>
+        </div>
+      </div>
+    </section>
   );
 };
 
