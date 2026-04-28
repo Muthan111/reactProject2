@@ -271,6 +271,26 @@
   box-shadow: var(--shadow);
 }
 
+.quiz-option--correct {
+  border-color: #1f8f5f;
+  background: rgba(31, 143, 95, 0.14);
+  box-shadow: 0 16px 40px rgba(31, 143, 95, 0.12);
+}
+
+.quiz-option--wrong {
+  border-color: #cc4b37;
+  background: rgba(204, 75, 55, 0.14);
+  box-shadow: 0 16px 40px rgba(204, 75, 55, 0.12);
+}
+
+.quiz-option--locked {
+  opacity: 0.68;
+}
+
+.quiz-option:disabled {
+  cursor: default;
+}
+
 .quiz-option__index {
   display: inline-flex;
   width: 2rem;

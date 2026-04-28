@@ -122,79 +122,95 @@ const quizQuestions: Record<Difficulty, Question[]> = {
 const Quiz = () => {
   const [stage, setStage] = useState(1);
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [hasAnswered, setHasAnswered] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
   const currentQuestions = selectedDifficulty ? quizQuestions[selectedDifficulty] : [];
-  const currentQuestion = currentQuestions[currentQuestionIndex];
+  const activeQuestion = currentQuestions[currentQuestion];
 
   function startQuiz(difficulty: Difficulty) {
     setSelectedDifficulty(difficulty);
-    setCurrentQuestionIndex(0);
+    setCurrentQuestion(0);
     setScore(0);
-    setSelectedOption(null);
+    setSelectedAnswer(null);
+    setHasAnswered(false);
     setIsComplete(false);
     setStage(2);
   }
 
   function prevStep() {
-    if (currentQuestionIndex === 0) {
+    if (currentQuestion === 0) {
       setStage(1);
       setSelectedDifficulty(null);
-      setSelectedOption(null);
+      setSelectedAnswer(null);
+      setHasAnswered(false);
       return;
     }
 
-    setCurrentQuestionIndex((prev) => prev - 1);
-    setSelectedOption(null);
+    setCurrentQuestion((prev) => prev - 1);
+    setSelectedAnswer(null);
+    setHasAnswered(false);
   }
 
-  function handleSubmit() {
-    if (!selectedOption || !currentQuestion) {
+  function handleAnswerSelect(answer: string) {
+    if (hasAnswered || !activeQuestion) {
       return;
     }
 
-    const isCorrect = selectedOption === currentQuestion.answer;
+    setSelectedAnswer(answer);
+    setHasAnswered(true);
 
+    const isCorrect = answer === activeQuestion.answer;
     if (isCorrect) {
       setScore((prev) => prev + 1);
     }
+  }
 
-    const isLastQuestion = currentQuestionIndex === currentQuestions.length - 1;
+  function handleNextQuestion() {
+    if (!hasAnswered || !activeQuestion) {
+      return;
+    }
+
+    const isLastQuestion = currentQuestion === currentQuestions.length - 1;
 
     if (isLastQuestion) {
       setIsComplete(true);
       return;
     }
 
-    setCurrentQuestionIndex((prev) => prev + 1);
-    setSelectedOption(null);
+    setCurrentQuestion((prev) => prev + 1);
+    setSelectedAnswer(null);
+    setHasAnswered(false);
   }
 
   function restartQuiz() {
     setStage(1);
     setSelectedDifficulty(null);
-    setCurrentQuestionIndex(0);
+    setCurrentQuestion(0);
     setScore(0);
-    setSelectedOption(null);
+    setSelectedAnswer(null);
+    setHasAnswered(false);
     setIsComplete(false);
   }
 
   return (
     <div>
       {stage === 1 && <Start startQuiz={startQuiz} />}
-      {stage === 2 && currentQuestion && !isComplete && (
+      {stage === 2 && activeQuestion && !isComplete && (
         <Screen1
-          question={currentQuestion.question}
-          options={currentQuestion.options}
-          currentScore={score}
-          questionNumber={currentQuestionIndex + 1}
+          question={activeQuestion.question}
+          options={activeQuestion.options}
+          correctAnswer={activeQuestion.answer}
+          score={score}
+          currentQuestion={currentQuestion}
           totalQuestions={currentQuestions.length}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-          onSubmit={handleSubmit}
+          selectedAnswer={selectedAnswer}
+          hasAnswered={hasAnswered}
+          onAnswerSelect={handleAnswerSelect}
+          onNext={handleNextQuestion}
           onBack={prevStep}
           difficulty={selectedDifficulty ?? "Easy"}
         />

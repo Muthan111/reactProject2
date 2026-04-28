@@ -1,12 +1,14 @@
 type Props = {
   question: string;
   options: string[];
-  currentScore: number;
-  questionNumber: number;
+  correctAnswer: string;
+  score: number;
+  currentQuestion: number;
   totalQuestions: number;
-  selectedOption: string | null;
-  setSelectedOption: (option: string) => void;
-  onSubmit: () => void;
+  selectedAnswer: string | null;
+  hasAnswered: boolean;
+  onAnswerSelect: (option: string) => void;
+  onNext: () => void;
   onBack: () => void;
   difficulty: string;
 };
@@ -14,21 +16,41 @@ type Props = {
 const Screen1 = ({
   question,
   options,
-  currentScore,
-  questionNumber,
+  correctAnswer,
+  score,
+  currentQuestion,
   totalQuestions,
-  selectedOption,
-  setSelectedOption,
-  onSubmit,
+  selectedAnswer,
+  hasAnswered,
+  onAnswerSelect,
+  onNext,
   onBack,
   difficulty,
 }: Props) => {
+  const questionNumber = currentQuestion + 1;
+
+  function getOptionClassName(option: string) {
+    if (!hasAnswered) {
+      return `quiz-option${selectedAnswer === option ? " quiz-option--selected" : ""}`;
+    }
+
+    if (option === correctAnswer) {
+      return "quiz-option quiz-option--correct";
+    }
+
+    if (option === selectedAnswer && option !== correctAnswer) {
+      return "quiz-option quiz-option--wrong";
+    }
+
+    return "quiz-option quiz-option--locked";
+  }
+
   return (
     <section className="quiz-screen">
       <div className="quiz-screen__top">
         <span className="quiz-pill">{difficulty}</span>
         <span className="quiz-pill">Question {questionNumber}</span>
-        <span className="quiz-pill">Score: {currentScore}</span>
+        <span className="quiz-pill">Score: {score}</span>
       </div>
 
       <div className="quiz-card">
@@ -42,8 +64,9 @@ const Screen1 = ({
             <button
               key={option}
               type="button"
-              className={`quiz-option${selectedOption === option ? " quiz-option--selected" : ""}`}
-              onClick={() => setSelectedOption(option)}
+              className={getOptionClassName(option)}
+              onClick={() => onAnswerSelect(option)}
+              disabled={hasAnswered}
             >
               <span className="quiz-option__index">{index + 1}</span>
               <span>{option}</span>
@@ -55,14 +78,11 @@ const Screen1 = ({
           <button type="button" className="quiz-action quiz-action--secondary" onClick={onBack}>
             Back
           </button>
-          <button
-            type="button"
-            className="quiz-action quiz-action--primary"
-            onClick={onSubmit}
-            disabled={!selectedOption}
-          >
-            {questionNumber === totalQuestions ? "Finish" : "Next"}
-          </button>
+          {hasAnswered && (
+            <button type="button" className="quiz-action quiz-action--primary" onClick={onNext}>
+              {questionNumber === totalQuestions ? "Finish" : "Next Question"}
+            </button>
+          )}
         </div>
       </div>
     </section>
