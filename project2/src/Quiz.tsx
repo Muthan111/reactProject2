@@ -8,6 +8,9 @@ type Question = {
   answer: string;
 };
 
+const INITIAL_QUESTION_COUNT = 5;
+const QUESTION_COUNT_INCREMENT = 1;
+
 // Questions are grouped by difficulty so the selected level can directly drive the quiz flow.
 const quizQuestions: Record<Difficulty, Question[]> = {
   Easy: [
@@ -120,25 +123,59 @@ const quizQuestions: Record<Difficulty, Question[]> = {
   ],
 };
 
+function shuffleQuestions(questions: Question[]) {
+  const shuffledQuestions = [...questions];
+
+  for (let index = shuffledQuestions.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffledQuestions[index], shuffledQuestions[swapIndex]] = [
+      shuffledQuestions[swapIndex],
+      shuffledQuestions[index],
+    ];
+  }
+
+  return shuffledQuestions;
+}
+
+function buildRoundQuestions(difficulty: Difficulty, questionCount: number) {
+  const difficultyQuestions = quizQuestions[difficulty];
+  const roundQuestions: Question[] = [];
+
+  while (roundQuestions.length < questionCount) {
+    roundQuestions.push(...shuffleQuestions(difficultyQuestions));
+  }
+
+  return roundQuestions.slice(0, questionCount);
+}
+
 const Quiz = () => {
   // `stage` controls whether we show the difficulty picker or the quiz/results screen.
   const [stage, setStage] = useState(1);
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(null);
+  const [currentQuestions, setCurrentQuestions] = useState<Question[]>([]);
+  const [questionCount, setQuestionCount] = useState(INITIAL_QUESTION_COUNT);
+  const [completedQuestionCount, setCompletedQuestionCount] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
-  // These derived values keep the rendered question in sync with the chosen difficulty and index.
-  const currentQuestions = selectedDifficulty ? quizQuestions[selectedDifficulty] : [];
   const activeQuestion = currentQuestions[currentQuestion];
 
-  function startQuiz(difficulty: Difficulty) {
-    // Starting a new quiz always resets progress from any previous run.
+  function startQuiz(
+    difficulty: Difficulty,
+    preservedScore = 0,
+    nextQuestionCount = INITIAL_QUESTION_COUNT,
+    preservedCompletedQuestionCount = 0
+  ) {
+    // Starting a new quiz resets question progress, but callers can preserve score for same-difficulty replays.
     setSelectedDifficulty(difficulty);
+    setCurrentQuestions(buildRoundQuestions(difficulty, nextQuestionCount));
+    setQuestionCount(nextQuestionCount);
+    setCompletedQuestionCount(preservedCompletedQuestionCount);
     setCurrentQuestion(0);
-    setScore(0);
+    setScore(preservedScore);
     setSelectedAnswer(null);
     setHasAnswered(false);
     setIsComplete(false);
@@ -198,13 +235,21 @@ const Quiz = () => {
       return;
     }
 
-    startQuiz(selectedDifficulty);
+    startQuiz(
+      selectedDifficulty,
+      score,
+      questionCount + QUESTION_COUNT_INCREMENT,
+      completedQuestionCount + currentQuestions.length
+    );
   }
 
   function restartQuiz() {
     // Returning to the start screen clears all quiz-specific state.
     setStage(1);
     setSelectedDifficulty(null);
+    setCurrentQuestions([]);
+    setQuestionCount(INITIAL_QUESTION_COUNT);
+    setCompletedQuestionCount(0);
     setCurrentQuestion(0);
     setScore(0);
     setSelectedAnswer(null);
@@ -236,7 +281,7 @@ const Quiz = () => {
           <div className="quiz-card">
             <p className="quiz-card__eyebrow">{selectedDifficulty} Complete</p>
             <h2>
-              You scored {score} out of {currentQuestions.length}
+              You scored {score} out of {completedQuestionCount + currentQuestions.length}
             </h2>
             <div className="quiz-actions">
               <button

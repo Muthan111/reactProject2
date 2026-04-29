@@ -12,7 +12,7 @@ const Start = ({ startQuiz }: Props) => {
       <div className="quiz-card">
         <p className="quiz-card__eyebrow">Math Quiz</p>
         <h1>Choose Quiz Difficulty</h1>
-        <p>Each difficulty now includes 5 questions.</p>
+        <p>Each difficulty starts with 5 questions, and continuing adds more.</p>
       <div>
         {difficultyLevels.map((level) => (
           <button
