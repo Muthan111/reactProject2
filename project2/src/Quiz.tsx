@@ -193,6 +193,14 @@ const Quiz = () => {
     setHasAnswered(false);
   }
 
+  function restartSameDifficulty() {
+    if (!selectedDifficulty) {
+      return;
+    }
+
+    startQuiz(selectedDifficulty);
+  }
+
   function restartQuiz() {
     // Returning to the start screen clears all quiz-specific state.
     setStage(1);
@@ -233,10 +241,17 @@ const Quiz = () => {
             <div className="quiz-actions">
               <button
                 type="button"
+                className="quiz-action quiz-action--primary"
+                onClick={restartSameDifficulty}
+              >
+                Continue Same Difficulty
+              </button>
+              <button
+                type="button"
                 className="quiz-action quiz-action--secondary"
                 onClick={restartQuiz}
               >
-                Choose Another Level
+                Restart Entire Game
               </button>
             </div>
           </div>
