@@ -8,6 +8,7 @@ type Question = {
   answer: string;
 };
 
+// Questions are grouped by difficulty so the selected level can directly drive the quiz flow.
 const quizQuestions: Record<Difficulty, Question[]> = {
   Easy: [
     {
@@ -120,6 +121,7 @@ const quizQuestions: Record<Difficulty, Question[]> = {
 };
 
 const Quiz = () => {
+  // `stage` controls whether we show the difficulty picker or the quiz/results screen.
   const [stage, setStage] = useState(1);
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -128,10 +130,12 @@ const Quiz = () => {
   const [hasAnswered, setHasAnswered] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
 
+  // These derived values keep the rendered question in sync with the chosen difficulty and index.
   const currentQuestions = selectedDifficulty ? quizQuestions[selectedDifficulty] : [];
   const activeQuestion = currentQuestions[currentQuestion];
 
   function startQuiz(difficulty: Difficulty) {
+    // Starting a new quiz always resets progress from any previous run.
     setSelectedDifficulty(difficulty);
     setCurrentQuestion(0);
     setScore(0);
@@ -142,6 +146,7 @@ const Quiz = () => {
   }
 
   function prevStep() {
+    // If we're on the first question, "Back" returns to difficulty selection instead of going negative.
     if (currentQuestion === 0) {
       setStage(1);
       setSelectedDifficulty(null);
@@ -156,6 +161,7 @@ const Quiz = () => {
   }
 
   function handleAnswerSelect(answer: string) {
+    // Lock the question after one choice so score changes only once per question.
     if (hasAnswered || !activeQuestion) {
       return;
     }
@@ -174,6 +180,7 @@ const Quiz = () => {
       return;
     }
 
+    // The last answered question transitions to the results view instead of another question.
     const isLastQuestion = currentQuestion === currentQuestions.length - 1;
 
     if (isLastQuestion) {
@@ -187,6 +194,7 @@ const Quiz = () => {
   }
 
   function restartQuiz() {
+    // Returning to the start screen clears all quiz-specific state.
     setStage(1);
     setSelectedDifficulty(null);
     setCurrentQuestion(0);

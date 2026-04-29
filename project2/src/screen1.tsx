@@ -30,6 +30,7 @@ const Screen1 = ({
   const questionNumber = currentQuestion + 1;
 
   function getOptionClassName(option: string) {
+    // Before answering, only highlight the selected choice; afterward, show correct/wrong feedback.
     if (!hasAnswered) {
       return `quiz-option${selectedAnswer === option ? " quiz-option--selected" : ""}`;
     }

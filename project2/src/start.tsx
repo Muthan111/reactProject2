@@ -4,6 +4,7 @@ interface Props {
 export type Difficulty = "Easy" | "Medium" | "Hard" | "Expert";
 
 const Start = ({ startQuiz }: Props) => {
+  // Keeping the levels in an array makes the difficulty buttons easy to render and update together.
   const difficultyLevels: Difficulty[] = ["Easy", "Medium", "Hard", "Expert"];
 
   return (
